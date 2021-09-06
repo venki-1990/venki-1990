@@ -7,20 +7,20 @@ void main()=>runApp(new MaterialApp(
 ));
 class Myapp extends StatefulWidget {
   const Myapp({Key? key}) : super(key: key);
-
   @override
   _MyappState createState() => _MyappState();
 }
-
 class _MyappState extends State<Myapp> {
   late String email,password;
-  GlobalKey<FormState>formkey=GlobalKey<FormState>();
-  void Login() {
-    FirebaseAuth.instance.signInWithEmailAndPassword(
+  final GlobalKey<FormState>formkey=GlobalKey<FormState>();
+  void Login() async{
+
+   await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email, password: password)
         .then((value) => print("success"))
         .catchError((onError){
       print("Error");
+
     }
     );
   }
@@ -49,7 +49,7 @@ class _MyappState extends State<Myapp> {
                 }
               },
               onSaved: (value){
-                email='value';
+                email=value!;
               },
               decoration: InputDecoration(
                 icon: Icon(Icons.email),
@@ -66,7 +66,7 @@ class _MyappState extends State<Myapp> {
                 }
               },
               onSaved: (value){
-                password='value';
+                password=value!;
               },
               obscureText: true,
               decoration: InputDecoration(
@@ -80,7 +80,7 @@ class _MyappState extends State<Myapp> {
               if(formkey.currentState!.validate()){
                 (formkey.currentState!.save());
                 Login();
-                FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+                //FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
               }
               },
