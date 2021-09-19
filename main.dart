@@ -1,96 +1,95 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-void main()=>runApp(new MaterialApp(
-  home: Myapp(),
-  debugShowCheckedModeBanner: false,
-));
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+void main()async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(new MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: Myapp(),
+  ));
+}
 class Myapp extends StatefulWidget {
   const Myapp({Key? key}) : super(key: key);
   @override
   _MyappState createState() => _MyappState();
 }
 class _MyappState extends State<Myapp> {
-  late String email,password;
-  final GlobalKey<FormState>formkey=GlobalKey<FormState>();
-  void Login() async{
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final GoogleSignIn_googlesignin = GoogleSignIn();
 
-   await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email, password: password)
-        .then((value) => print("success"))
-        .catchError((onError){
-      print("Error");
+  //get auth => null;
 
-    }
-    );
+  @override void initState() {
+    // TODO: implement initState
+    super.initState();
+    signInwithGoogle();
   }
+
   @override
-  Widget build(BuildContext context) {
-    Firebase.initializeApp();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Login"),
-        centerTitle: true,
+  Widget build(BuildContext context){
+    return MaterialApp();
+  }
+
+  Future<String?> signInwithGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final GoogleSignInAccount? googleSignInAccount = await googleSignIn
+        .signIn();
+    if (googleSignInAccount != null) {
+      final GoogleSignInAuthentication googleSignInAuthentication =
+      await googleSignInAccount.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken,
+      );
+      UserCredential result = await auth.signInWithCredential(credential);
+      User? user =
+          (await auth.signInWithCredential(credential)).user;
+      if (result != null) {}
+      await showDialog(context: context, builder: (context) =>
+      new AlertDialog(
+        title: Text("message"),
+        content: Text("you have a alert message"),
+        actions: <Widget>[
+          FlatButton(onPressed: () {
+            },
+              child: Text("Sign in")),
+        ],
       ),
-      body: Form(
-        key: formkey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-                padding: EdgeInsets.all(12)),
-            TextFormField(
-              validator: (value){
-                if(value!.isEmpty) {
-                  return "Enter your email";
-                }else{
-                  return null;
-                }
-              },
-              onSaved: (value){
-                email=value!;
-              },
-              decoration: InputDecoration(
-                icon: Icon(Icons.email),
-                hintText: "Enter your email",
-                labelText: "email",
-              ),
+      );
+      @override
+      Widget build(BuildContext context) {
+
+        return Scaffold(
+            appBar: AppBar(
+              title: Text("GOOGLE"),
+              centerTitle: true,
             ),
-            TextFormField(
-              validator: (value){
-                if(value!.isEmpty) {
-                  return "Enter your password";
-                }else{
-                  return null;
-                }
-              },
-              onSaved: (value){
-                password=value!;
-              },
-              obscureText: true,
-              decoration: InputDecoration(
-                icon: Icon(Icons.password),
-                hintText: "Enter your password",
-                labelText: "password",
+            body: Center(
+              child: Container(
+                child: new RaisedButton(
+                  color: Colors.white70,
+                  onPressed: () {
+                    setState(() {
+                      signInwithGoogle();
+                    });
+                  },
+                  child: Text("Sign in  with Google"),
+                ),
               ),
-            ),
-            FlatButton(onPressed:(){
-              print("success");
-              if(formkey.currentState!.validate()){
-                (formkey.currentState!.save());
-                Login();
-                //FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-
-              }
-              },
-                textColor: Colors.blue,
-                child:Text("Login")),
-          ],
-
-        ),
-      ),
-
-    );
+            )
+        );
+      }
+    }
   }
 }
+
+
+
+
+
+
+
+
